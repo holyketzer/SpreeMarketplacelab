@@ -1,0 +1,9 @@
+<div>
+    API Key: <%= SpreeMarketplacelab::Config[:apiKey] %>
+</div>
+<div>
+    Account Key: <%= SpreeMarketplacelab::Config[:accountKey] %>
+</div>
+<div data-hook="homepage_products">
+    <%= render 'spree/shared/products', :products => @products %>
+</div>

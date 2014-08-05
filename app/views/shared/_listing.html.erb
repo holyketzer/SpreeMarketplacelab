@@ -1,0 +1,9 @@
+<div id="listing">
+    <h6 class="product-section-title">Listings</h6>
+    <% @product.listings.each do |listing| %>
+        <div>title: <%=listing['title'] %></div>
+        <div>qty: <%=listing['quantity_available'] %> units</div>
+        <br />
+        <br />
+    <% end %>
+</div>

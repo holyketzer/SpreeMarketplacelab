@@ -1,0 +1,37 @@
+<%= render 'spree/admin/shared/configuration_menu' %>
+
+<% content_for :page_title do %>
+    Marketplace Configuration
+<% end %>
+
+<%= form_tag admin_marketplace_configuration_path, method: :put do %>
+
+    <fieldset class="no-border-top">
+        <div data-hook="admin_editor_method_form_fields">
+            <div class="row">
+                <div class="alpha twelve columns" data-hook="marketplace_configuration">
+                    <fieldset class="no-border-bottom">
+                        <legend align="center">Marketplace Configuration</legend>
+                        <div class="field">
+                            <%= label_tag(:apiKey, 'API Key') + tag(:br) %>
+                            <%= preference_field_tag(:apiKey, SpreeMarketplacelab::Config[:apiKey], class: 'fullwidth') %>
+                        </div>
+                        <div class="field">
+                            <%= label_tag(:accountKey, 'Account Key') + tag(:br) %>
+                            <%= preference_field_tag(:accountKey, SpreeMarketplacelab::Config[:accountKey], class: 'fullwidth') %>
+                        </div>
+                        <div class="field">
+                            <%= label_tag(:apiBaseUrl, 'API Base Url') + tag(:br) %>
+                            <%= preference_field_tag(:apiBaseUrl, SpreeMarketplacelab::Config[:apiBaseUrl], class: 'fullwidth') %>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="form-buttons filter-actions actions" data-hook="buttons">
+        <%= button Spree.t('actions.update'), 'icon-refresh' %>
+    </div>
+
+<% end %>
