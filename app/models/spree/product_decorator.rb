@@ -1,7 +1,4 @@
-require_relative '../../marketplace'
-
 Spree::Product.class_eval do
-
   def listings
     return @listings unless @listings == nil
 
@@ -12,7 +9,10 @@ Spree::Product.class_eval do
 
     marketplace_api = Marketplace::Api.new(api_key, account_key, api_base_url)
 
-    @listings = marketplace_api.get_listings("WL-240")
+    if sku.empty?
+      @listings = []
+    else
+      @listings = marketplace_api.get_listings(sku)
+    end
   end
-
 end
