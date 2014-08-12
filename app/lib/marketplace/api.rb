@@ -19,7 +19,7 @@ module Marketplace
       def get_api_response(endpoint_url, params)
         response = ::HTTParty.get(@api_base_url + endpoint_url + params + "&apikey=" + @api_key + "&accountkey=" + @account_key, :verify => false)
 
-        return convert_array_to_ruby_style response unless response == nil
+        return convert_array_to_ruby_style response if response && response.code == 200
       end
 
       def convert_array_to_ruby_style(camel_case_arr)
