@@ -55,7 +55,7 @@ module Marketplace
             end
 
             # add converted hash pair to new has
-            ruby_case_hash.merge!({ActiveSupport::Inflector.underscore(key) => val})
+            ruby_case_hash.merge!({get_underscored_key(key) => val})
           end
           ruby_arr.push(ruby_case_hash)
         end
@@ -76,9 +76,15 @@ module Marketplace
           end
 
           # add converted hash pair to new has
-          ruby_case_hash.merge!({ActiveSupport::Inflector.underscore(key) => val})
+          ruby_case_hash.merge!({get_underscored_key(key) => val})
         end
         ruby_case_hash
       end
+
+      def get_underscored_key(key)
+        underscored_key = ActiveSupport::Inflector.underscore(key)
+        underscored_key = underscored_key.downcase.tr(" ", "_")
+      end
+
   end
 end
