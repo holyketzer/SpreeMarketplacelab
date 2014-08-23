@@ -18,10 +18,15 @@ module Marketplace
       end
     end
 
+    # @listing_ids comma separated list of listings identifiers
+    def get_deliveryoptions(listing_ids)
+      get_api_response("/api/listings/#{listing_ids}/shippingmethods")
+    end
+
     # get listings for a product(s)
     # @product_ids comma separated list of product identifiers
     def get_listings(product_ids)
-      get_api_response("/api/products/listings", "id=" + product_ids)
+      get_api_response("/api/products/#{product_ids}/listings")
     end
 
     def get_listing(listing_id)
