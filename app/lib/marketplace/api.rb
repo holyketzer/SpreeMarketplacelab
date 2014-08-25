@@ -19,8 +19,8 @@ module Marketplace
     end
 
     # @listing_ids comma separated list of listings identifiers
-    def get_deliveryoptions(listing_ids)
-      get_api_response("/api/listings/#{listing_ids}/shippingmethods")
+    def get_deliveryoptions(listing_ids, country_code)
+      get_api_response("/api/listings/#{listing_ids}/shippingmethods/#{country_code}")
     end
 
     # get listings for a product(s)
