@@ -6,6 +6,8 @@ module Marketplace
       @api_key = api_key
       @account_key = account_key
       @api_base_url = api_base_url
+
+      subscribe_to_webhooks
     end
 
     def self.instance
@@ -35,6 +37,29 @@ module Marketplace
     end
 
     private
+
+      def subscribe_to_webhooks
+        subscribe_to :listing_created
+      end
+
+      def subscribe_to(subscription_type)
+        int_subscription_type = 0
+        case subscription_type
+          when :listing_created
+            int_subscription_type = 6
+        end
+        post_api_response("/api/hooks", "", {
+                                  :HookSubscriptionType => int_subscription_type,
+                                  :TargetUrl => "http://" + Spree::Config.site_url + "/marketplace/listener/listing"
+                                }.to_json)
+      end
+
+      def post_api_response(endpoint_url, params = '', json = '')
+        url = "#{@api_base_url}#{endpoint_url}?#{params}&apikey=#{@api_key}&accountkey=#{@account_key}"
+        response = ::HTTParty.post(url, verify: false, body: json, headers: {'Content-Type' => 'application/json'})
+
+        return (response.code >= 200 || response.code < 300)
+      end
 
       def get_api_response(endpoint_url, params = '')
         url = "#{@api_base_url}#{endpoint_url}?#{params}&apikey=#{@api_key}&accountkey=#{@account_key}"
