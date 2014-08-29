@@ -1,7 +1,31 @@
 require 'httparty'
 
+module Listenable
+
+  def listeners() @listeners ||= [] end
+
+  def add_listener(listener)
+    listeners << listener
+  end
+
+  def remove_listener(listener)
+    listeners.delete listener
+  end
+
+  def notify_listeners(event_name, *args)
+    listeners.each do |listener|
+      if listener.respond_to? event_name
+        listener.__send__ event_name, *args
+      end
+    end
+  end
+
+end
+
 module Marketplace
   class Api
+    include Listenable
+
     def initialize(api_key, account_key, api_base_url)
       @api_key = api_key
       @account_key = account_key
@@ -18,6 +42,10 @@ module Marketplace
 
         self.new(api_key, account_key, api_base_url)
       end
+    end
+
+    def notify(event_name, data)
+      notify_listeners(event_name, data)
     end
 
     # @listing_ids comma separated list of listings identifiers

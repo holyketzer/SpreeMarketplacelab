@@ -10,6 +10,6 @@ Spree::Core::Engine.routes.draw do
   end
 
   namespace :marketplace, defaults: { format: 'json' } do
-    get "/listener/listing" => "listener#listing"
+    post "/listener/listing" => "listener#listing"
   end
 end
