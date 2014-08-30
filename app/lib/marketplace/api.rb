@@ -1,27 +1,5 @@
 require 'httparty'
 
-module Listenable
-
-  def listeners() @listeners ||= [] end
-
-  def add_listener(listener)
-    listeners << listener
-  end
-
-  def remove_listener(listener)
-    listeners.delete listener
-  end
-
-  def notify_listeners(event_name, *args)
-    listeners.each do |listener|
-      if listener.respond_to? event_name
-        listener.__send__ event_name, *args
-      end
-    end
-  end
-
-end
-
 module Marketplace
   class Api
     include Listenable
@@ -30,8 +8,6 @@ module Marketplace
       @api_key = api_key
       @account_key = account_key
       @api_base_url = api_base_url
-
-      subscribe_to_webhooks
     end
 
     def self.instance
@@ -64,34 +40,45 @@ module Marketplace
       listing[0] if listing && listing.any?
     end
 
-    private
+    def subscribe_to_webhooks
+      subscribe_to :listing_created
+    end
 
-      def subscribe_to_webhooks
-        subscribe_to :listing_created
+    private
+      def logger
+        @logger ||= MarketplaceLogger.new
       end
 
       def subscribe_to(subscription_type)
-        int_subscription_type = 0
-        case subscription_type
-          when :listing_created
-            int_subscription_type = 6
+        int_subscription_type = case subscription_type
+          when :listing_created then 6
+          else 0
         end
-        post_api_response("/api/hooks", "", {
-                                  :HookSubscriptionType => int_subscription_type,
-                                  :TargetUrl => "http://" + Spree::Config.site_url + "/marketplace/listener/listing"
-                                }.to_json)
+
+        json = {
+          HookSubscriptionType: int_subscription_type,
+          TargetUrl: 'http://' + Spree::Config.site_url + '/marketplace/listener/listing'
+        }.to_json
+
+        post_api_response('/api/hooks', '', json)
       end
 
       def post_api_response(endpoint_url, params = '', json = '')
         url = "#{@api_base_url}#{endpoint_url}?#{params}&apikey=#{@api_key}&accountkey=#{@account_key}"
+        logger.info "Marketplace POST #{url} #{json}"
+
         response = ::HTTParty.post(url, verify: false, body: json, headers: {'Content-Type' => 'application/json'})
+        logger.info "Marketplace POST response code=#{response.code} content-length=#{response.headers['content-length']}"
 
         return (response.code >= 200 || response.code < 300)
       end
 
       def get_api_response(endpoint_url, params = '')
         url = "#{@api_base_url}#{endpoint_url}?#{params}&apikey=#{@api_key}&accountkey=#{@account_key}"
+        logger.info "Marketplace GET #{url}"
+
         response = ::HTTParty.get(url, verify: false)
+        logger.info "Marketplace GET response code=#{response.code} content-length=#{response.headers['content-length']}"
 
         return convert_array_to_ruby_style(response) if response && response.code == 200
       end
@@ -143,6 +130,5 @@ module Marketplace
         underscored_key = ActiveSupport::Inflector.underscore(key)
         underscored_key = underscored_key.downcase.tr(" ", "_")
       end
-
   end
 end
